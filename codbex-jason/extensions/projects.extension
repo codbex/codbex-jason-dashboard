@@ -1,0 +1,5 @@
+{
+    "module": "codbex-jason/services/projects.js",
+    "extensionPoint": "ide-subview",
+    "description": "Projects Subview"
+}

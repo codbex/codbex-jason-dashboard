@@ -1,0 +1,11 @@
+{
+    "name": "@codbex/codbex-jason",
+    "version": "0.3.0",
+    "repository": {
+        "url": "https://github.com/codbex/codbex-jason.git",
+        "type": "git"
+    },
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com"
+    }
+}
