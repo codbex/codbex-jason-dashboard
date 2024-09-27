@@ -1,6 +1,13 @@
 {
     "guid": "codbex-jason",
-    "dependencies": [],
+    "dependencies": [
+        {
+            "guid": "codbex-projects",
+            "type": "git",
+            "url": "https://github.com/codbex/codbex-projects.git",
+            "branch": "main"
+        },
+    ],
     "actions": [
         {
             "name": "Build TypeScript",
