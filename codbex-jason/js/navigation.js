@@ -36,6 +36,24 @@ navigation.controller("LaunchpadViewController", ["$scope", "messageHub", "$http
                 }
             ]
         },
+        {
+            "name": "Settings", "groups": [
+                {
+                    "name": "Configurations", "expanded": "configurationsExpanded", "icon": "wrench",
+                    "items": [
+                        { "name": "AgileMethodology", "view": "agilemethodology" },
+                        { "name": "ApprovalStatus", "view": "approvalstatus" },
+                        { "name": "CostCategory", "view": "costcategory" },
+                        { "name": "ExpenseCategory", "view": "expensecategory" },
+                        { "name": "IterationLenght", "view": "iterationlenght" },
+                        { "name": "MemberRole", "view": "memberrole" },
+                        { "name": "ResourceType", "view": "resourcetype" },
+                        { "name": "StakeHolderType", "view": "stakeholdertype" },
+                        { "name": "StatusType", "view": "statustype" }
+                    ]
+                }
+            ]
+        }
     ];
 
 }]);

@@ -7,7 +7,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         busyText: "Loading...",
     };
 
-
+    $scope.state.isBusy = false;
     $scope.today = new Date();
 
 }]);

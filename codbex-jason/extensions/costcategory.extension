@@ -1,0 +1,5 @@
+{
+    "module": "codbex-jason/services/costcategory.js",
+    "extensionPoint": "ide-subview",
+    "description": "Cost Category Subview"
+}

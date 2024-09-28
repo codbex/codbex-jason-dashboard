@@ -1,0 +1,5 @@
+{
+    "module": "codbex-jason/services/stakeholdertype.js",
+    "extensionPoint": "ide-subview",
+    "description": "Stakeholder Type Subview"
+}

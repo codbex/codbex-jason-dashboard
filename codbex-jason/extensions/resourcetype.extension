@@ -1,0 +1,5 @@
+{
+    "module": "codbex-jason/services/resourcetype.js",
+    "extensionPoint": "ide-subview",
+    "description": "Resource Type Subview"
+}
