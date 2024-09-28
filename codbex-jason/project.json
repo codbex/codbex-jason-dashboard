@@ -6,7 +6,7 @@
             "type": "git",
             "url": "https://github.com/codbex/codbex-projects.git",
             "branch": "main"
-        },
+        }
     ],
     "actions": [
         {
