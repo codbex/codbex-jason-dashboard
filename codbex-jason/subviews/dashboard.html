@@ -37,6 +37,23 @@
                 Dashboard
             </h2>
 
+            <div class="fd-col fd-col--12 fd-col-md--6 fd-col-lg--6 fd-col-xl--6">
+                <fd-card card-type="table">
+                    <fd-card-content>
+                        <table fd-table inner-borders="horizontal" outer-borders="none" style="min-height:12.5rem">
+                            <tbody fd-table-body>
+                                <tr fd-table-row>
+                                    <td fd-table-cell width="50%">
+                                        <!-- Right section for doughnut chart -->
+                                        <canvas id="doughnutChart" width="200" height="200"></canvas>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </fd-card-content>
+                </fd-card>
+            </div>
+
             <fd-message-page glyph="sap-icon--error" ng-if="state.error">
                 <fd-message-page-title>Dashboard encounterd an error!</fd-message-page-title>
                 <fd-message-page-subtitle>{{errorMessage}}</fd-message-page-subtitle>
