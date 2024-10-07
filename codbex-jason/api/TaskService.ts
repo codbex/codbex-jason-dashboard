@@ -1,35 +1,44 @@
-import { TaskRepository as TaskDao } from "codbex-projects/gen/codbex-projects/dao/Project/TaskRepository";
-
+import { TaskRepository as TaskDao } from "codbex-projects/gen/codbex-projects/dao/Deliverable/TaskRepository";
 import { Controller, Get } from "sdk/http";
 import { query } from "sdk/db";
-import { response } from "sdk/http";
 
 @Controller
 class BudgetService {
     private readonly taskDao;
 
-
     constructor() {
         this.taskDao = new TaskDao();
     }
 
-    @Get("/budgetData")
-    public budgetData() {
-        const sqlBudget = `
+    @Get("/taskData")
+    public taskData() {
+        const sqlTasks = `
             SELECT
-                SUM(b."BUDGET_INITIALBUDGET") AS "INITIALBUDGET_SUM",
-                SUM(b."BUDGET_COSTESTIMATION") AS "COSTESTIMATION_SUM"
+                t."TASK_ID" AS "Id",
+                t."TASK_NAME" AS "Name",
+                t."TASK_DESCRIPTION" AS "Description",
+                t."TASK_STARTDATE" AS "StartDate",
+                t."TASK_ENDDATE" AS "EndDate",
+                t."TASK_STATUSTYPE" AS "StatusType",
+                t."TASK_DELIVERABLE" AS "Deliverable"
             FROM
-                "CODBEX_BUDGET" b
+                "CODBEX_TASK" t
         `;
 
-        let resultset = query.execute(sqlBudget);
-        const budgetData = resultset[0];
+        let resultset = query.execute(sqlTasks);
+
+        const taskData = resultset.map(task => ({
+            "Id": task.Id,
+            "Name": task.Name,
+            "Description": task.Description,
+            "StartDate": task.StartDate,
+            "EndDate": task.EndDate,
+            "StatusType": task.StatusType,
+            "Deliverable": task.Deliverable
+        }));
 
         return {
-            "InitialBudget": budgetData.INITIALBUDGET_SUM,
-            "CostEstimation": budgetData.COSTESTIMATION_SUM
+            "tasks": taskData
         };
     }
-
 }
