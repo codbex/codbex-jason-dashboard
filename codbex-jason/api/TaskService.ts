@@ -1,4 +1,4 @@
-import { BudgetRepository as BudgetDao } from "codbex-projects/gen/codbex-projects/dao/Project/BudgetRepository";
+import { TaskRepository as TaskDao } from "codbex-projects/gen/codbex-projects/dao/Project/TaskRepository";
 
 import { Controller, Get } from "sdk/http";
 import { query } from "sdk/db";
@@ -6,11 +6,11 @@ import { response } from "sdk/http";
 
 @Controller
 class BudgetService {
-    private readonly budgetDao;
+    private readonly taskDao;
 
 
     constructor() {
-        this.budgetDao = new BudgetDao();
+        this.taskDao = new TaskDao();
     }
 
     @Get("/budgetData")

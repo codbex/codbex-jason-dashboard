@@ -63,6 +63,16 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         }
     }
 
+    async function getTasks() {
+        try {
+            const response = await $http.get("/services/ts/codbex-jason/api/BudgetService.ts/budgetData");
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching budget data:', error);
+            return null;
+        }
+    }
+
     // Current date
     $scope.today = new Date();
 }]);
