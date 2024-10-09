@@ -85,7 +85,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             $scope.todayTasks = $scope.tasks.filter(task => {
                 const startDate = new Date(task.StartDate);
                 const endDate = new Date(task.EndDate);
-                const isNotDone = task.StatusType !== 1; // Assuming 1 means "done"
+                const isNotDone = task.StatusType !== 1; // 1 means "done"
                 const isTodayInRange = $scope.today >= startDate && $scope.today <= endDate;
                 return isNotDone && isTodayInRange;
             });
