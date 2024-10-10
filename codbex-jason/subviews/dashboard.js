@@ -92,6 +92,16 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         }
     }
 
+    async function getMilestones() {
+        const tasksServiceUrl = "/services/ts/codbex-jason/api/MilestoneService.ts/milestoneData";
+        try {
+            const response = await $http.get(tasksServiceUrl);
+            $scope.tasks = response.data.tasks; // Store all tasks in scope
+        } catch (error) {
+            console.error('Error fetching tasks:', error);
+        }
+    }
+
     $scope.openPerspective = function (perspective) {
         if (perspective === 'all-tasks') {
             messageHub.postMessage('launchpad.switch.perspective', { perspectiveId: 'deliverables' }, true);

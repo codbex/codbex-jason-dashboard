@@ -32,12 +32,11 @@ class BudgetService {
             "Id": milestone.Id,
             "Name": milestone.Name,
             "Description": milestone.Description,
-            "StartDate": milestone.Due,  // You can adjust based on your date structure
-            "EndDate": milestone.Due,    // Assuming Due is a timestamp range; else calculate start & end dates
+            "StartDate": milestone.Due,
+            "EndDate": milestone.Due,
             "StatusType": milestone.StatusType
         }));
 
-        // Return the formatted data as JSON
         return {
             "tasks": milestoneData
         };
