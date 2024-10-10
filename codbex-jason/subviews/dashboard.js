@@ -100,5 +100,8 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         if (perspective === 'all-tasks') {
             messageHub.postMessage('launchpad.switch.perspective', { perspectiveId: 'deliverables' }, true);
         }
+        if (perspective === 'project') {
+            messageHub.postMessage('launchpad.switch.perspective', { perspectiveId: 'projects' }, true);
+        }
     }
 }]);
