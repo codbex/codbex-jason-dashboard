@@ -138,34 +138,30 @@
                 </fd-panel-content>
             </fd-panel>
 
-
-            <!-- Add this before your panel to check if data is loading -->
-            <pre>{{ milestoneTasks | json }}</pre>
-
             <fd-panel expanded="true" class="fd-col fd-col--12 fd-col-md--12">
                 <fd-panel-header>
                     <fd-panel-expand></fd-panel-expand>
                     <h4 fd-panel-title>Milestones</h4>
                 </fd-panel-header>
                 <fd-panel-content aria-label="Milestones">
-                    <div class="fd-col fd-col--6 fd-col-md--3 fd-col-lg--3 fd-col-xl--3">
+                    <div class="fd-col fd-col--12 fd-col-md--12">
                         <table class="fd-table fd-table--no-horizontal-borders fd-table--no-vertical-borders">
                             <thead class="fd-table__header">
                                 <tr class="fd-table__row">
-                                    <th class="fd-table__cell" scope="col">Task Name</th>
+                                    <th class="fd-table__cell" scope="col">Milestone Name</th>
                                     <th class="fd-table__cell" scope="col">Description</th>
-                                    <th class="fd-table__cell" scope="col">Start Date</th>
-                                    <th class="fd-table__cell" scope="col">End Date</th>
+                                    <th class="fd-table__cell" scope="col">Due</th>
+                                    <th class="fd-table__cell" scope="col">Status Type</th>
                                 </tr>
                             </thead>
                             <tbody class="fd-table__body">
-                                <tr ng-repeat="task in milestoneTasks">
-                                    <td class="fd-table__cell">{{task.Name}}</td>
-                                    <td class="fd-table__cell">{{task.Description}}</td>
-                                    <td class="fd-table__cell">{{task.StartDate | date : 'shortDate'}}</td>
-                                    <td class="fd-table__cell">{{task.EndDate | date : 'shortDate'}}</td>
+                                <tr ng-repeat="milestone in milestones">
+                                    <td class="fd-table__cell">{{milestone.Name}}</td>
+                                    <td class="fd-table__cell">{{milestone.Description}}</td>
+                                    <td class="fd-table__cell">{{milestone.Range | date : 'shortDate'}}</td>
+                                    <td class="fd-table__cell">{{milestone.StatusType}}</td>
                                 </tr>
-                                <tr ng-if="milestoneTasks.length === 0">
+                                <tr ng-if="milestones.length === 0">
                                     <td colspan="4" class="fd-table__cell">No milestones available.</td>
                                 </tr>
                             </tbody>

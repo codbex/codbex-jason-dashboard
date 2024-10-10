@@ -9,17 +9,17 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
 
     // Current date
     $scope.today = new Date();
-    $scope.todayTasks = []; // Array to hold today's tasks
+    $scope.todayTasks = [];
+    $scope.milestones = [];
 
-    // Fetch Budget and Tasks data when document is ready
+    // Fetch Budget, Tasks, and Milestones data when document is ready
     angular.element($document[0]).ready(async function () {
-        await getBudget(); // Fetch budget data
-        await getTasks(); // Fetch all tasks data
-
-        // Filter today's tasks after fetching all tasks
+        await getBudget();
+        await getTasks();
+        await getMilestones();
         filterTodayTasks();
 
-        // Prepare Doughnut Chart Data
+        // Doughnut Chart Configuration
         const doughnutData = {
             labels: ['Initial Budget', 'Cost Estimation'],
             datasets: [{
@@ -28,7 +28,6 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             }]
         };
 
-        // Doughnut Chart Configuration
         const doughnutOptions = {
             responsive: true,
             maintainAspectRatio: false,
@@ -45,7 +44,6 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             }
         };
 
-        // Initialize Doughnut Chart
         const doughnutChartCtx = $document[0].getElementById('doughnutChart').getContext('2d');
         new Chart(doughnutChartCtx, {
             type: 'doughnut',
@@ -53,30 +51,36 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             options: doughnutOptions
         });
 
-        // Update state to indicate loading is complete
         $scope.$apply(function () {
             $scope.state.isBusy = false;
         });
     });
 
-    // Function to fetch budget data
     async function getBudget() {
         try {
             const response = await $http.get("/services/ts/codbex-jason/api/BudgetService.ts/budgetData");
-            $scope.BudgetData = response.data; // Store budget data in scope
+            $scope.BudgetData = response.data;
         } catch (error) {
             console.error('Error fetching budget data:', error);
         }
     }
 
-    // Function to fetch all tasks data
     async function getTasks() {
-        const tasksServiceUrl = "/services/ts/codbex-jason/api/TaskService.ts/taskData";
         try {
-            const response = await $http.get(tasksServiceUrl);
-            $scope.tasks = response.data.tasks; // Store all tasks in scope
+            const response = await $http.get("/services/ts/codbex-jason/api/TaskService.ts/taskData");
+            $scope.tasks = response.data.tasks;
         } catch (error) {
             console.error('Error fetching tasks:', error);
+        }
+    }
+
+    async function getMilestones() {
+        const milestoneServiceUrl = "/services/ts/codbex-jason/api/MilestoneService.ts/milestoneData";
+        try {
+            const response = await $http.get(milestoneServiceUrl);
+            $scope.milestones = response.data.milestones;
+        } catch (error) {
+            console.error('Error fetching milestones:', error);
         }
     }
 
@@ -85,20 +89,10 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             $scope.todayTasks = $scope.tasks.filter(task => {
                 const startDate = new Date(task.StartDate);
                 const endDate = new Date(task.EndDate);
-                const isNotDone = task.StatusType !== 1; // 1 means "done"
+                const isNotDone = task.StatusType !== 1;
                 const isTodayInRange = $scope.today >= startDate && $scope.today <= endDate;
                 return isNotDone && isTodayInRange;
             });
-        }
-    }
-
-    async function getMilestones() {
-        const tasksServiceUrl = "/services/ts/codbex-jason/api/MilestoneService.ts/milestoneData";
-        try {
-            const response = await $http.get(tasksServiceUrl);
-            $scope.tasks = response.data.tasks; // Store all tasks in scope
-        } catch (error) {
-            console.error('Error fetching tasks:', error);
         }
     }
 
@@ -106,7 +100,5 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         if (perspective === 'all-tasks') {
             messageHub.postMessage('launchpad.switch.perspective', { perspectiveId: 'deliverables' }, true);
         }
-        ;
     }
-
 }]);

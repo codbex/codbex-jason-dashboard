@@ -3,7 +3,7 @@ import { Controller, Get } from "sdk/http";
 import { query } from "sdk/db";
 
 @Controller
-class BudgetService {
+class MilestoneService {
     private readonly milestoneDao;
 
     constructor() {
@@ -11,34 +11,30 @@ class BudgetService {
     }
 
     @Get("/milestoneData")
-    public async milestoneData() {
-        // Query to fetch milestone tasks from MilestoneRepository
-        const milestoneTasks = `
+    public milestoneData() {
+        const sqlMilestones = `
             SELECT
                 m."MILESTONEPERIOD_ID" AS "Id",
                 m."MILESTONEPERIOD_NAME" AS "Name",
                 m."MILESTONEPERIOD_DESCRIPTION" AS "Description",
-                m."MILESTONEPERIOD_RANGE" AS "Due",
+                m."MILESTONEPERIOD_RANGE" AS "Range",
                 m."MILESTONEPERIOD_STATUSTYPE" AS "StatusType"
             FROM
                 "CODBEX_MILESTONEPERIOD" m
         `;
 
-        // Execute the query to get the milestone data
-        let resultset = await query.execute(milestoneTasks);
+        let resultset = query.execute(sqlMilestones);
 
-        // Map the resultset into a usable format for the frontend
         const milestoneData = resultset.map(milestone => ({
             "Id": milestone.Id,
             "Name": milestone.Name,
             "Description": milestone.Description,
-            "StartDate": milestone.Due,
-            "EndDate": milestone.Due,
+            "Range": milestone.Range,
             "StatusType": milestone.StatusType
         }));
 
         return {
-            "tasks": milestoneData
+            "milestones": milestoneData
         };
     }
 }
