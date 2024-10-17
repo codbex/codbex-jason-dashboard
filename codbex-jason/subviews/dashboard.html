@@ -52,7 +52,7 @@
                                         <tbody fd-table-body>
                                             <tr fd-table-row>
                                                 <td fd-table-cell width="50%">
-                                                    <canvas id="doughnutChart" width="200" height="200"></canvas>
+                                                    <canvas id="doughnutChartBudget" width="200" height="200"></canvas>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -85,6 +85,59 @@
                     </div>
                 </fd-panel-content>
             </fd-panel>
+
+            <fd-panel expanded="true" class="fd-col fd-col--12">
+                <fd-panel-header>
+                    <fd-panel-expand></fd-panel-expand>
+                    <h4 fd-panel-title>Expenses</h4>
+                </fd-panel-header>
+                <fd-panel-content aria-label="Expense Content">
+                    <div class="fd-row" style="margin: 0.5em">
+                        <div class="fd-col fd-col--12 fd-col-md--6 fd-col-lg--6 fd-col-xl--6">
+                            <fd-card card-type="table">
+                                <fd-card-content>
+                                    <table fd-table inner-borders="horizontal" outer-borders="none"
+                                        style="min-height:12.5rem">
+                                        <tbody fd-table-body>
+                                            <tr fd-table-row>
+                                                <td fd-table-cell width="50%">
+                                                    <canvas id="doughnutChartExpenses" width="200"
+                                                        height="200"></canvas>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </fd-card-content>
+                            </fd-card>
+                        </div>
+                        <div class="fd-col fd-col--6 fd-col-md--3 fd-col-lg--3 fd-col-xl--3">
+                            <div role="button" tabindex="0" class="fd-tile fd-tile--feed tile-auto-layout"
+                                ng-click="openPerspective('project')">
+                                <div class="fd-tile__header tile-auto-layout">
+                                    <div class="fd-tile__title">Most expensive expense</div>
+                                </div>
+                                <div class="fd-tile__content tile-auto-layout">
+                                    <div class="fd-tile__section">
+                                        <div class="fd-numeric-content">
+                                            <div class="fd-numeric-content__kpi-container">
+                                                <div class="fd-numeric-content__kpi">
+                                                    <i class="sap-icon--money-bills" aria-hidden="true"
+                                                        style="margin-right: 0.25em;"></i>
+                                                    {{highestExpense}} BGN
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fd-tile__footer tile-auto-layout">
+                                    <span class="fd-tile__footer-text"> Date:{{ExpenseData.Date}} </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fd-panel-content>
+            </fd-panel>
+
 
             <fd-panel expanded="true" class="fd-col fd-col--12 fd-col-md--6">
                 <fd-panel-header>

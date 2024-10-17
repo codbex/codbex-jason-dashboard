@@ -11,22 +11,45 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
     $scope.today = new Date();
     $scope.todayTasks = [];
     $scope.milestones = [];
+    $scope.highestExpense = 0;
+    $scope.expenseRatios = { approved: 0, pending: 0, declined: 0 }; // Ratios for expense types
 
-    // Fetch Budget, Tasks, and Milestones data when document is ready
+    // Fetch Budget, Tasks, Milestones, and Expenses when document is ready
     angular.element($document[0]).ready(async function () {
         await getBudget();
         await getTasks();
         await getMilestones();
+        await getExpense();
         filterTodayTasks();
 
         // Doughnut Chart Configuration
-        const doughnutData = {
-            labels: ['Initial Budget', 'Cost Estimation'],
+        const budgetDataDoughnut = {
+            labels: ["Initial Budget", "Cost Estimation"],
             datasets: [{
                 data: [$scope.BudgetData.InitialBudget, $scope.BudgetData.CostEstimation],
                 backgroundColor: ['#36a2eb', '#ff6384']
             }]
         };
+        setupDoughnutChart('doughnutChartBudget', budgetDataDoughnut);
+
+
+        const expenseDataDoughnut = {
+            labels: ["Approved", "Pending", "Declined"],
+            datasets: [{
+                data: [$scope.expenseRatios.approved, $scope.expenseRatios.pending, $scope.expenseRatios.declined],
+                backgroundColor: ['#36a2eb', '#ff6384', '#e5e463']
+            }]
+        };
+        setupDoughnutChart('doughnutChartExpenses', expenseDataDoughnut);
+
+
+        $scope.$apply(function () {
+            $scope.state.isBusy = false;
+        });
+    });
+
+    function setupDoughnutChart(chartElementId, data) {
+        const doughnutData = data;
 
         const doughnutOptions = {
             responsive: true,
@@ -36,7 +59,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             },
             title: {
                 display: true,
-                text: 'Budget Status'
+                text: 'Expense Status'
             },
             animation: {
                 animateScale: true,
@@ -44,17 +67,13 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             }
         };
 
-        const doughnutChartCtx = $document[0].getElementById('doughnutChart').getContext('2d');
+        const doughnutChartCtx = $document[0].getElementById(chartElementId).getContext('2d');
         new Chart(doughnutChartCtx, {
             type: 'doughnut',
             data: doughnutData,
             options: doughnutOptions
         });
-
-        $scope.$apply(function () {
-            $scope.state.isBusy = false;
-        });
-    });
+    }
 
     async function getBudget() {
         try {
@@ -93,6 +112,42 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
                 const isTodayInRange = $scope.today >= startDate && $scope.today <= endDate;
                 return isNotDone && isTodayInRange;
             });
+        }
+    }
+
+    async function getExpense() {
+        try {
+            const response = await $http.get("/services/ts/codbex-jason/api/ExpenseService.ts/expenseData");
+            $scope.ExpenseData = response.data;
+
+            // Calculate highest expense amount
+            if ($scope.ExpenseData.Expenses.length > 0) {
+                $scope.highestExpense = Math.max(
+                    ...$scope.ExpenseData.Expenses
+                        .filter(expense => expense.ApprovalStatus === 2) // Filter for approved expenses
+                        .map(expense => expense.Amount)
+                );
+            }
+
+            // Calculate expense ratios
+            const totalExpenses = $scope.ExpenseData.Expenses.length;
+            const approvedExpenses = $scope.ExpenseData.Expenses.filter(expense => expense.ApprovalStatus === 2).length;
+            const pendingExpenses = $scope.ExpenseData.Expenses.filter(expense => expense.ApprovalStatus === 1).length;
+            const declinedExpenses = $scope.ExpenseData.Expenses.filter(expense => expense.ApprovalStatus === 3).length;
+
+            // Store ratios in $scope
+            if (totalExpenses > 0) {
+                $scope.expenseRatios.approved = approvedExpenses;
+                $scope.expenseRatios.pending = pendingExpenses;
+                $scope.expenseRatios.declined = declinedExpenses;
+            } else {
+                // If no expenses, set ratios to 0
+                $scope.expenseRatios.approved = 0;
+                $scope.expenseRatios.pending = 0;
+                $scope.expenseRatios.declined = 0;
+            }
+        } catch (error) {
+            console.error('Error fetching expense data:', error);
         }
     }
 
