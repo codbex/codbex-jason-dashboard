@@ -14,6 +14,14 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
     $scope.highestExpense = 0;
     $scope.expenseRatios = { approved: 0, pending: 0, declined: 0 }; // Ratios for expense types
 
+    $scope.taskCategories = {
+        Done: [],
+        InProgress: [],
+        DevelopingFeature: [],
+        Deprecated: [],
+        Research: []
+    };
+
     // Fetch Budget, Tasks, Milestones, and Expenses when document is ready
     angular.element($document[0]).ready(async function () {
         await getBudget();
@@ -22,7 +30,6 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         await getExpense();
         filterTodayTasks();
 
-        // Doughnut Chart Configuration
         const budgetDataDoughnut = {
             labels: ["Initial Budget", "Cost Estimation"],
             datasets: [{
@@ -31,7 +38,6 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             }]
         };
         setupDoughnutChart('doughnutChartBudget', budgetDataDoughnut);
-
 
         const expenseDataDoughnut = {
             labels: ["Approved", "Pending", "Declined"],
@@ -42,6 +48,20 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         };
         setupDoughnutChart('doughnutChartExpenses', expenseDataDoughnut);
 
+        const taskDataDoughnut = {
+            labels: ["Done", "InProgress", "DevelopingFeature", "Deprecated", "Research"],
+            datasets: [{
+                data: [
+                    $scope.taskCategories.Done.length,
+                    $scope.taskCategories.InProgress.length,
+                    $scope.taskCategories.DevelopingFeature.length,
+                    $scope.taskCategories.Deprecated.length,
+                    $scope.taskCategories.Research.length
+                ],
+                backgroundColor: ['#36a2eb', '#ff6384', '#e5e463', '#ffcc00', '#66ff66']
+            }]
+        };
+        setupDoughnutChart('doughnutChartTasks', taskDataDoughnut);
 
         $scope.$apply(function () {
             $scope.state.isBusy = false;
@@ -59,7 +79,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             },
             title: {
                 display: true,
-                text: 'Expense Status'
+                text: 'Diagram'
             },
             animation: {
                 animateScale: true,
@@ -88,6 +108,27 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         try {
             const response = await $http.get("/services/ts/codbex-jason/api/TaskService.ts/taskData");
             $scope.tasks = response.data.tasks;
+
+            $scope.tasks.forEach(task => {
+                switch (task.StatusType) {
+                    case 1:
+                        $scope.taskCategories.Done.push(task);
+                        break;
+                    case 2:
+                        $scope.taskCategories.InProgress.push(task);
+                        break;
+                    case 3:
+                        $scope.taskCategories.DevelopingFeature.push(task);
+                        break;
+                    case 4:
+                        $scope.taskCategories.Deprecated.push(task);
+                        break;
+                    case 5:
+                        $scope.taskCategories.Research.push(task);
+                        break;
+                }
+            });
+
         } catch (error) {
             console.error('Error fetching tasks:', error);
         }
@@ -132,7 +173,6 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
                         .filter(expense => expense.ApprovalStatus === 2) // Filter for approved expenses
                         .map(expense => expense.Date)
                 );
-
             }
 
             // Calculate expense ratios
