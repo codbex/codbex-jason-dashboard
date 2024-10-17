@@ -127,6 +127,12 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
                         .filter(expense => expense.ApprovalStatus === 2) // Filter for approved expenses
                         .map(expense => expense.Amount)
                 );
+                $scope.highestExpenseDate = Math.max(
+                    ...$scope.ExpenseData.Expenses
+                        .filter(expense => expense.ApprovalStatus === 2) // Filter for approved expenses
+                        .map(expense => expense.Date)
+                );
+
             }
 
             // Calculate expense ratios
