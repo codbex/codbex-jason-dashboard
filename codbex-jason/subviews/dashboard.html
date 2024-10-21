@@ -237,13 +237,51 @@
                                     <td class="fd-table__cell">{{milestone.Name}}</td>
                                     <td class="fd-table__cell">{{milestone.Description}}</td>
                                     <td class="fd-table__cell">{{milestone.Range | date : 'shortDate'}}</td>
-                                    <td class="fd-table__cell">{{milestone.StatusType}}</td>
+                                    <td class="fd-table__cell">{{ milestone.statusText }}</td>
                                 </tr>
                                 <tr ng-if="milestones.length === 0">
                                     <td colspan="4" class="fd-table__cell">No milestones available.</td>
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </fd-panel-content>
+            </fd-panel>
+
+            <fd-panel expanded="true" class="fd-col fd-col--12 fd-col-md--12">
+                <fd-panel-header>
+                    <fd-panel-expand></fd-panel-expand>
+                    <h4 fd-panel-title>Success rate</h4>
+                </fd-panel-header>
+                <fd-panel-content aria-label="Success Content">
+                    <div class="fd-layout-grid">
+                        <div class="fd-row">
+                            <div>
+                                <label for="projectSelect">Select Project:</label>
+                                <select id="projectSelect" ng-model="selectedProject"
+                                    ng-options="project.name for project in projects" ng-change="onProjectChange()">
+                                    <option value="">-- Select a Project --</option>
+                                </select>
+                            </div>
+
+                            <div class="fd-col fd-col--6 fd-col-md--6 fd-col-lg--6 fd-col-xl--6">
+                                <fd-card card-type="table">
+                                    <fd-card-content>
+                                        <table fd-table inner-borders="horizontal" outer-borders="none"
+                                            style="min-height:12.5rem">
+                                            <tbody fd-table-body>
+                                                <tr fd-table-row>
+                                                    <td fd-table-cell width="50%">
+                                                        <canvas id="doughnutChartSuccess" width="200"
+                                                            height="200"></canvas>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </fd-card-content>
+                                </fd-card>
+                            </div>
+                        </div>
                     </div>
                 </fd-panel-content>
             </fd-panel>

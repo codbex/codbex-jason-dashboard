@@ -22,6 +22,15 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         Research: []
     };
 
+    const statusTypeMapping = {
+        1: 'Done',
+        2: 'InProgress',
+        3: 'DevelopingFeature',
+        4: 'Deprecated',
+        5: 'Research'
+    };
+
+
     // Fetch Budget, Tasks, Milestones, and Expenses when document is ready
     angular.element($document[0]).ready(async function () {
         await getBudget();
@@ -62,6 +71,18 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             }]
         };
         setupDoughnutChart('doughnutChartTasks', taskDataDoughnut);
+
+        const sucessDataDoughnut = {
+            labels: ["Success rate", "Not to success"],
+            datasets: [{
+                data: [
+                    $scope.successRate,
+                    100 - $scope.successRate
+                ],
+                backgroundColor: ['#36a2eb', '#ff6384']
+            }]
+        };
+        setupDoughnutChart('doughnutChartSuccess', sucessDataDoughnut);
 
         $scope.$apply(function () {
             $scope.state.isBusy = false;
@@ -109,40 +130,65 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             const response = await $http.get("/services/ts/codbex-jason/api/TaskService.ts/taskData");
             $scope.tasks = response.data.tasks;
 
+            let totalTasks = 0;
+            let doneTasks = 0;
+
             $scope.tasks.forEach(task => {
                 switch (task.StatusType) {
                     case 1:
                         $scope.taskCategories.Done.push(task);
+                        doneTasks += 1;
+                        totalTasks += 1;
                         break;
                     case 2:
                         $scope.taskCategories.InProgress.push(task);
+                        totalTasks += 1;
                         break;
                     case 3:
                         $scope.taskCategories.DevelopingFeature.push(task);
+                        totalTasks += 1;
                         break;
                     case 4:
                         $scope.taskCategories.Deprecated.push(task);
                         break;
                     case 5:
                         $scope.taskCategories.Research.push(task);
+                        totalTasks += 1;
                         break;
                 }
             });
+
+            // Calculate success rate
+            if (totalTasks > 0) {
+                $scope.successRate = (doneTasks / totalTasks) * 100;
+            } else {
+                $scope.successRate = 0; // No tasks
+            }
+
+            console.log("Success Rate:", $scope.successRate + "%");
 
         } catch (error) {
             console.error('Error fetching tasks:', error);
         }
     }
 
+
     async function getMilestones() {
         const milestoneServiceUrl = "/services/ts/codbex-jason/api/MilestoneService.ts/milestoneData";
         try {
             const response = await $http.get(milestoneServiceUrl);
             $scope.milestones = response.data.milestones;
+
+            // Map the StatusType to a status string
+            $scope.milestones.forEach(milestone => {
+                milestone.statusText = statusTypeMapping[milestone.StatusType] || 'Unknown Status';
+            });
+
         } catch (error) {
             console.error('Error fetching milestones:', error);
         }
     }
+
 
     function filterTodayTasks() {
         if ($scope.tasks) {
