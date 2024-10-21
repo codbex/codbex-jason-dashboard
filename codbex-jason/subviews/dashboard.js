@@ -8,11 +8,16 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
     };
 
     // Current date
+    let doughnutCharts = {};
+
     $scope.today = new Date();
     $scope.todayTasks = [];
     $scope.milestones = [];
     $scope.highestExpense = 0;
     $scope.expenseRatios = { approved: 0, pending: 0, declined: 0 }; // Ratios for expense types
+    $scope.selectedDeliverable = null;
+    $scope.deliverables = [];
+    $scope.filteredTasks = [];
 
     $scope.taskCategories = {
         Done: [],
@@ -90,6 +95,10 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
     });
 
     function setupDoughnutChart(chartElementId, data) {
+        if (doughnutCharts[chartElementId]) {
+            doughnutCharts[chartElementId].destroy();
+        }
+
         const doughnutData = data;
 
         const doughnutOptions = {
@@ -109,7 +118,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         };
 
         const doughnutChartCtx = $document[0].getElementById(chartElementId).getContext('2d');
-        new Chart(doughnutChartCtx, {
+        doughnutCharts[chartElementId] = new Chart(doughnutChartCtx, {  // Save the new chart instance
             type: 'doughnut',
             data: doughnutData,
             options: doughnutOptions
@@ -130,46 +139,80 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             const response = await $http.get("/services/ts/codbex-jason/api/TaskService.ts/taskData");
             $scope.tasks = response.data.tasks;
 
-            let totalTasks = 0;
-            let doneTasks = 0;
+            const deliverableSet = new Set($scope.tasks.map(task => task.Deliverable));
+            $scope.deliverables = Array.from(deliverableSet);
 
-            $scope.tasks.forEach(task => {
-                switch (task.StatusType) {
-                    case 1:
-                        $scope.taskCategories.Done.push(task);
-                        doneTasks += 1;
-                        totalTasks += 1;
-                        break;
-                    case 2:
-                        $scope.taskCategories.InProgress.push(task);
-                        totalTasks += 1;
-                        break;
-                    case 3:
-                        $scope.taskCategories.DevelopingFeature.push(task);
-                        totalTasks += 1;
-                        break;
-                    case 4:
-                        $scope.taskCategories.Deprecated.push(task);
-                        break;
-                    case 5:
-                        $scope.taskCategories.Research.push(task);
-                        totalTasks += 1;
-                        break;
-                }
-            });
-
-            // Calculate success rate
-            if (totalTasks > 0) {
-                $scope.successRate = (doneTasks / totalTasks) * 100;
-            } else {
-                $scope.successRate = 0; // No tasks
-            }
-
-            console.log("Success Rate:", $scope.successRate + "%");
-
+            $scope.filterTasksByDeliverable($scope.selectedDeliverable);
         } catch (error) {
             console.error('Error fetching tasks:', error);
         }
+    }
+
+    // Filter tasks by selected deliverable
+    $scope.filterTasksByDeliverable = function (selectedDeliverable) {
+        if (selectedDeliverable) {
+            $scope.filteredTasks = $scope.tasks.filter(task => task.Deliverable === selectedDeliverable);
+        } else {
+            $scope.filteredTasks = $scope.tasks;
+        }
+        categorizeAndCalculateSuccessRate($scope.filteredTasks, selectedDeliverable);
+    };
+
+    function categorizeAndCalculateSuccessRate(tasks, selectedDeliverable) {
+        $scope.taskCategories.Done = [];
+        $scope.taskCategories.InProgress = [];
+        $scope.taskCategories.DevelopingFeature = [];
+        $scope.taskCategories.Deprecated = [];
+        $scope.taskCategories.Research = [];
+
+        let totalTasks = 0;
+        let doneTasks = 0;
+
+        tasks.forEach(task => {
+            switch (task.StatusType) {
+                case 1:
+                    $scope.taskCategories.Done.push(task);
+                    doneTasks += 1;
+                    totalTasks += 1;
+                    break;
+                case 2:
+                    $scope.taskCategories.InProgress.push(task);
+                    totalTasks += 1;
+                    break;
+                case 3:
+                    $scope.taskCategories.DevelopingFeature.push(task);
+                    totalTasks += 1;
+                    break;
+                case 4:
+                    $scope.taskCategories.Deprecated.push(task);
+                    break;
+                case 5:
+                    $scope.taskCategories.Research.push(task);
+                    totalTasks += 1;
+                    break;
+            }
+        });
+
+        // Calculate success rate for the selected deliverable
+        if (totalTasks > 0) {
+            $scope.successRate = (doneTasks / totalTasks) * 100;
+        } else {
+            $scope.successRate = 0;  // No tasks
+        }
+
+        console.log("Success Rate for Deliverable:", selectedDeliverable, $scope.successRate + "%");
+
+        const sucessDataDoughnut = {
+            labels: ["Success rate", "Not to success"],
+            datasets: [{
+                data: [
+                    $scope.successRate,
+                    100 - $scope.successRate
+                ],
+                backgroundColor: ['#36a2eb', '#ff6384']
+            }]
+        };
+        setupDoughnutChart('doughnutChartSuccess', sucessDataDoughnut);
     }
 
 

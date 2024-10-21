@@ -3,7 +3,7 @@ import { Controller, Get } from "sdk/http";
 import { query } from "sdk/db";
 
 @Controller
-class BudgetService {
+class TaskService {
     private readonly taskDao;
 
     constructor() {
@@ -23,6 +23,8 @@ class BudgetService {
                 t."TASK_DELIVERABLE" AS "Deliverable"
             FROM
                 "CODBEX_TASK" t
+            ORDER BY
+                t."TASK_DELIVERABLE" ASC
         `;
 
         let resultset = query.execute(sqlTasks);

@@ -258,10 +258,12 @@
                         <div class="fd-row">
                             <div>
                                 <label for="projectSelect">Select Project:</label>
-                                <select id="projectSelect" ng-model="selectedProject"
-                                    ng-options="project.name for project in projects" ng-change="onProjectChange()">
-                                    <option value="">-- Select a Project --</option>
+                                <select ng-model="selectedDeliverable"
+                                    ng-options="deliverable as deliverable for deliverable in deliverables"
+                                    ng-change="filterTasksByDeliverable(selectedDeliverable)">
+                                    <option value="">All Deliverables</option>
                                 </select>
+
                             </div>
 
                             <div class="fd-col fd-col--6 fd-col-md--6 fd-col-lg--6 fd-col-xl--6">
