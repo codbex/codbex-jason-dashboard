@@ -256,14 +256,23 @@
                 <fd-panel-content aria-label="Success Content">
                     <div class="fd-layout-grid">
                         <div class="fd-row">
-                            <div>
-                                <label for="projectSelect">Select Project:</label>
-                                <select ng-model="selectedDeliverable"
-                                    ng-options="deliverable as deliverable for deliverable in deliverables"
-                                    ng-change="filterTasksByDeliverable(selectedDeliverable)">
-                                    <option value="">All Deliverables</option>
-                                </select>
+                            <div class="fd-col">
+                                <div>
+                                    <label for="projectSelect">Select Project:</label>
+                                    <select ng-model="selectedProject" ng-options="project for project in projects"
+                                        ng-change="filterDeliverableByProject(selectedProject)">
+                                        <option value="">Select a Project</option>
+                                    </select>
+                                </div>
 
+                                <div>
+                                    <label for="deliverableSelect">Select Deliverable:</label>
+                                    <select ng-model="selectedDeliverable"
+                                        ng-options="deliverable as deliverable for deliverable in deliverables"
+                                        ng-change="filterTasksByDeliverable(selectedDeliverable)">
+                                        <option value="">Select a Deliverable</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="fd-col fd-col--6 fd-col-md--6 fd-col-lg--6 fd-col-xl--6">

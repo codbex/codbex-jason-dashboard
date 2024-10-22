@@ -15,8 +15,12 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
     $scope.milestones = [];
     $scope.highestExpense = 0;
     $scope.expenseRatios = { approved: 0, pending: 0, declined: 0 }; // Ratios for expense types
-    $scope.selectedDeliverable = null;
+
+    $scope.projects = [];
+    $scope.selectedProject = null;
     $scope.deliverables = [];
+    $scope.filteredDeliverables = [];
+    $scope.selectedDeliverable = null;
     $scope.filteredTasks = [];
 
     $scope.taskCategories = {
@@ -35,15 +39,23 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         5: 'Research'
     };
 
-
     // Fetch Budget, Tasks, Milestones, and Expenses when document is ready
     angular.element($document[0]).ready(async function () {
         await getBudget();
+        await getProjects(); // Fetch projects
         await getTasks();
+        await getDeliverables();
         await getMilestones();
         await getExpense();
         filterTodayTasks();
+        setupDoughnutCharts();
 
+        $scope.$apply(function () {
+            $scope.state.isBusy = false;
+        });
+    });
+
+    function setupDoughnutCharts() {
         const budgetDataDoughnut = {
             labels: ["Initial Budget", "Cost Estimation"],
             datasets: [{
@@ -77,7 +89,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         };
         setupDoughnutChart('doughnutChartTasks', taskDataDoughnut);
 
-        const sucessDataDoughnut = {
+        const successDataDoughnut = {
             labels: ["Success rate", "Not to success"],
             datasets: [{
                 data: [
@@ -87,12 +99,8 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
                 backgroundColor: ['#36a2eb', '#ff6384']
             }]
         };
-        setupDoughnutChart('doughnutChartSuccess', sucessDataDoughnut);
-
-        $scope.$apply(function () {
-            $scope.state.isBusy = false;
-        });
-    });
+        setupDoughnutChart('doughnutChartSuccess', successDataDoughnut);
+    }
 
     function setupDoughnutChart(chartElementId, data) {
         if (doughnutCharts[chartElementId]) {
@@ -118,7 +126,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         };
 
         const doughnutChartCtx = $document[0].getElementById(chartElementId).getContext('2d');
-        doughnutCharts[chartElementId] = new Chart(doughnutChartCtx, {  // Save the new chart instance
+        doughnutCharts[chartElementId] = new Chart(doughnutChartCtx, {
             type: 'doughnut',
             data: doughnutData,
             options: doughnutOptions
@@ -134,27 +142,73 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         }
     }
 
+    async function getProjects() { // New function to fetch projects
+        try {
+            const response = await $http.get("/services/ts/codbex-jason/api/ProjectRepository.ts/projectData");
+            $scope.projects = response.data.projects || []; // Ensure projects is an array
+        } catch (error) {
+            console.error('Error fetching projects:', error);
+        }
+    }
+
     async function getTasks() {
         try {
             const response = await $http.get("/services/ts/codbex-jason/api/TaskService.ts/taskData");
             $scope.tasks = response.data.tasks;
 
+            // Update deliverables based on fetched tasks
             const deliverableSet = new Set($scope.tasks.map(task => task.Deliverable));
             $scope.deliverables = Array.from(deliverableSet);
 
+            // Filter tasks for selected deliverable
             $scope.filterTasksByDeliverable($scope.selectedDeliverable);
         } catch (error) {
             console.error('Error fetching tasks:', error);
         }
     }
 
+    async function getDeliverables() {
+        try {
+            const response = await $http.get("/services/ts/codbex-jason/api/DeliverableService.ts/deliverableData");
+            if (response.data && Array.isArray(response.data.deliverables)) {
+                $scope.deliverables = response.data.deliverables;
+
+                // Filter deliverables by the selected project
+                $scope.filterDeliverableByProject($scope.selectedProject);
+            } else {
+                console.error('Deliverables data is not in the expected format:', response.data);
+                $scope.deliverables = [];
+            }
+        } catch (error) {
+            console.error('Error fetching deliverables:', error);
+        }
+    }
+
+    $scope.filterDeliverableByProject = function (selectedProject) {
+        $scope.selectedProject = selectedProject; // Set selected project
+
+        if (selectedProject) {
+            // Filter deliverables connected to the selected project
+            $scope.filteredDeliverables = $scope.deliverables.filter(deliverable => deliverable.ProjectId === selectedProject);
+        } else {
+            $scope.filteredDeliverables = $scope.deliverables;
+        }
+
+        $scope.selectedDeliverable = null; // Reset selected deliverable
+        $scope.filterTasksByDeliverable(null); // Reset tasks
+    };
+
     // Filter tasks by selected deliverable
     $scope.filterTasksByDeliverable = function (selectedDeliverable) {
+        $scope.selectedDeliverable = selectedDeliverable; // Set selected deliverable
+
         if (selectedDeliverable) {
             $scope.filteredTasks = $scope.tasks.filter(task => task.Deliverable === selectedDeliverable);
         } else {
             $scope.filteredTasks = $scope.tasks;
         }
+
+        // Re-categorize tasks and calculate success rate
         categorizeAndCalculateSuccessRate($scope.filteredTasks, selectedDeliverable);
     };
 
@@ -202,7 +256,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
 
         console.log("Success Rate for Deliverable:", selectedDeliverable, $scope.successRate + "%");
 
-        const sucessDataDoughnut = {
+        const successDataDoughnut = {
             labels: ["Success rate", "Not to success"],
             datasets: [{
                 data: [
@@ -212,9 +266,8 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
                 backgroundColor: ['#36a2eb', '#ff6384']
             }]
         };
-        setupDoughnutChart('doughnutChartSuccess', sucessDataDoughnut);
+        setupDoughnutChart('doughnutChartSuccess', successDataDoughnut);
     }
-
 
     async function getMilestones() {
         const milestoneServiceUrl = "/services/ts/codbex-jason/api/MilestoneService.ts/milestoneData";
@@ -231,7 +284,6 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             console.error('Error fetching milestones:', error);
         }
     }
-
 
     function filterTodayTasks() {
         if ($scope.tasks) {
@@ -252,16 +304,13 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
 
             // Calculate highest expense amount
             if ($scope.ExpenseData.Expenses.length > 0) {
-                $scope.highestExpense = Math.max(
-                    ...$scope.ExpenseData.Expenses
-                        .filter(expense => expense.ApprovalStatus === 2) // Filter for approved expenses
-                        .map(expense => expense.Amount)
-                );
-                $scope.highestExpenseDate = Math.max(
-                    ...$scope.ExpenseData.Expenses
-                        .filter(expense => expense.ApprovalStatus === 2) // Filter for approved expenses
-                        .map(expense => expense.Date)
-                );
+                const highestExpenseObj = $scope.ExpenseData.Expenses
+                    .filter(expense => expense.ApprovalStatus === 2) // Filter for approved expenses
+                    .reduce((prev, current) => (prev.Amount > current.Amount) ? prev : current); // Find the one with the highest amount
+
+                // Set the highest expense and its date
+                $scope.highestExpense = highestExpenseObj.Amount;
+                $scope.highestExpenseDate = new Date(highestExpenseObj.Date).toISOString().split('T')[0];
             }
 
             // Calculate expense ratios
