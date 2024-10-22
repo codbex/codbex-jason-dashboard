@@ -259,7 +259,8 @@
                             <div class="fd-col">
                                 <div>
                                     <label for="projectSelect">Select Project:</label>
-                                    <select ng-model="selectedProject" ng-options="project for project in projects"
+                                    <select id="projectSelect" ng-model="selectedProject"
+                                        ng-options="project.Name for project in projects"
                                         ng-change="filterDeliverableByProject(selectedProject)">
                                         <option value="">Select a Project</option>
                                     </select>
@@ -267,35 +268,36 @@
 
                                 <div>
                                     <label for="deliverableSelect">Select Deliverable:</label>
-                                    <select ng-model="selectedDeliverable"
-                                        ng-options="deliverable as deliverable for deliverable in deliverables"
+                                    <select id="deliverableSelect" ng-model="selectedDeliverable"
+                                        ng-options="deliverable.Name for deliverable in filteredDeliverables"
                                         ng-change="filterTasksByDeliverable(selectedDeliverable)">
                                         <option value="">Select a Deliverable</option>
                                     </select>
                                 </div>
                             </div>
 
-                            <div class="fd-col fd-col--6 fd-col-md--6 fd-col-lg--6 fd-col-xl--6">
-                                <fd-card card-type="table">
-                                    <fd-card-content>
-                                        <table fd-table inner-borders="horizontal" outer-borders="none"
-                                            style="min-height:12.5rem">
-                                            <tbody fd-table-body>
-                                                <tr fd-table-row>
-                                                    <td fd-table-cell width="50%">
-                                                        <canvas id="doughnutChartSuccess" width="200"
-                                                            height="200"></canvas>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </fd-card-content>
-                                </fd-card>
-                            </div>
+                        </div>
+
+                        <div class="fd-col fd-col--6 fd-col-md--6 fd-col-lg--6 fd-col-xl--6">
+                            <fd-card card-type="table">
+                                <fd-card-content>
+                                    <table fd-table inner-borders="horizontal" outer-borders="none"
+                                        style="min-height:12.5rem">
+                                        <tbody fd-table-body>
+                                            <tr fd-table-row>
+                                                <td fd-table-cell width="50%">
+                                                    <canvas id="doughnutChartSuccess" width="200" height="200"></canvas>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </fd-card-content>
+                            </fd-card>
                         </div>
                     </div>
-                </fd-panel-content>
-            </fd-panel>
+        </div>
+        </fd-panel-content>
+        </fd-panel>
         </div>
 
         <fd-message-page glyph="sap-icon--error" ng-if="state.error">

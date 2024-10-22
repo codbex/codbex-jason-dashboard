@@ -1,4 +1,4 @@
-import { ProjectRepository as ProjectDao } from "codbex-projects/gen/codbex-projects/dao/Project/ProjectRepository.ts";
+import { ProjectRepository as ProjectDao } from "codbex-projects/gen/codbex-projects/dao/Project/ProjectRepository";
 import { Controller, Get } from "sdk/http";
 import { query } from "sdk/db";
 
