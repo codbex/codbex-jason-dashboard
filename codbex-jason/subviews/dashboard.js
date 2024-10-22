@@ -187,7 +187,6 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
     $scope.filterDeliverableByProject = function (selectedProject) {
         $scope.selectedProject = selectedProject; // Set selected project
 
-        console.log(selectedProject);
         if (selectedProject) {
             $scope.filteredDeliverables = $scope.deliverables.filter(deliverable => deliverable.ProjectId === selectedProject.Id);
             $scope.filterTasksByDeliverable($scope.filteredDeliverables);
@@ -195,7 +194,6 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             $scope.filteredDeliverables = $scope.deliverables;
             $scope.filterTasksByDeliverable(null); // Reset tasks
         }
-        // $scope.selectedDeliverable = null; // Reset selected deliverable
     };
 
     // Filter tasks by selected deliverable
@@ -203,17 +201,25 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         $scope.selectedDeliverable = selectedDeliverable; // Set selected deliverable
 
         if (selectedDeliverable) {
-            $scope.filteredTasks = $scope.tasks.filter(task => task.Deliverable === selectedDeliverable.Id);
-            console.log($scope.selectedDeliverable);
-            console.log($scope.tasks);
+            // Check if selectedDeliverable is an array (list of deliverables)
+            if (Array.isArray(selectedDeliverable)) {
+                // If it's an array, filter tasks based on each deliverable's Id
+                $scope.filteredTasks = $scope.tasks.filter(task =>
+                    selectedDeliverable.some(deliverable => task.Deliverable === deliverable.Id)
+                );
+            } else {
+                // If it's a single deliverable object, filter by its Id
+                $scope.filteredTasks = $scope.tasks.filter(task => task.Deliverable === selectedDeliverable.Id);
+            }
         } else {
+            // If no deliverable is selected, show all tasks
             $scope.filteredTasks = $scope.tasks;
         }
-
 
         // Re-categorize tasks and calculate success rate
         categorizeAndCalculateSuccessRate($scope.filteredTasks, selectedDeliverable);
     };
+
 
     function categorizeAndCalculateSuccessRate(tasks, selectedDeliverable) {
         $scope.taskCategories.Done = [];
