@@ -22,6 +22,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
     $scope.filteredDeliverables = [];
     $scope.selectedDeliverable = null;
     $scope.filteredTasks = [];
+    $scope.notSuccessPercentage = 0;
 
     $scope.taskCategories = {
         Done: [],
@@ -44,7 +45,11 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         await getBudget();
         await getProjects(); // Fetch projects
         await getTasks();
+
         await getDeliverables();
+        // Filter deliverables by the selected project
+        $scope.filterDeliverableByProject($scope.selectedProject);
+
         await getMilestones();
         await getExpense();
         filterTodayTasks();
@@ -94,7 +99,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             datasets: [{
                 data: [
                     $scope.successRate,
-                    100 - $scope.successRate
+                    $scope.notSuccessPercentage
                 ],
                 backgroundColor: ['#36a2eb', '#ff6384']
             }]
@@ -172,9 +177,6 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             const response = await $http.get("/services/ts/codbex-jason/api/DeliverableService.ts/deliverableData");
             if (response.data && Array.isArray(response.data.deliverables)) {
                 $scope.deliverables = response.data.deliverables;
-
-                // Filter deliverables by the selected project
-                $scope.filterDeliverableByProject($scope.selectedProject);
             } else {
                 console.error('Deliverables data is not in the expected format:', response.data);
                 $scope.deliverables = [];
@@ -189,7 +191,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
 
         if (selectedProject) {
             $scope.filteredDeliverables = $scope.deliverables.filter(deliverable => deliverable.ProjectId === selectedProject.Id);
-            $scope.filterTasksByDeliverable($scope.filteredDeliverables);
+            $scope.filterTasksByDeliverable(null);
         } else {
             $scope.filteredDeliverables = $scope.deliverables;
             $scope.filterTasksByDeliverable(null); // Reset tasks
@@ -198,21 +200,26 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
 
     // Filter tasks by selected deliverable
     $scope.filterTasksByDeliverable = function (selectedDeliverable) {
-        $scope.selectedDeliverable = selectedDeliverable; // Set selected deliverable
-
         if (selectedDeliverable) {
+            $scope.selectedProject = $scope.projects.find(project => project.Id === selectedDeliverable.ProjectId);
+            $scope.filteredDeliverables = $scope.deliverables.filter(deliverable => deliverable.ProjectId === $scope.selectedProject.Id);
+            $scope.selectedDeliverable = selectedDeliverable;
+        } else if ($scope.selectedProject) {
+            $scope.selectedDeliverable = $scope.deliverables.filter(deliverable => deliverable.ProjectId === $scope.selectedProject.Id);
+        } else {
+            $scope.selectedDeliverable = null;
+        }
+
+        if ($scope.selectedDeliverable) {
             // Check if selectedDeliverable is an array (list of deliverables)
-            if (Array.isArray(selectedDeliverable)) {
-                // If it's an array, filter tasks based on each deliverable's Id
+            if (Array.isArray($scope.selectedDeliverable)) {
                 $scope.filteredTasks = $scope.tasks.filter(task =>
-                    selectedDeliverable.some(deliverable => task.Deliverable === deliverable.Id)
+                    $scope.selectedDeliverable.some(deliverable => task.Deliverable === deliverable.Id)
                 );
             } else {
-                // If it's a single deliverable object, filter by its Id
-                $scope.filteredTasks = $scope.tasks.filter(task => task.Deliverable === selectedDeliverable.Id);
+                $scope.filteredTasks = $scope.tasks.filter(task => task.Deliverable === $scope.selectedDeliverable.Id);
             }
         } else {
-            // If no deliverable is selected, show all tasks
             $scope.filteredTasks = $scope.tasks;
         }
 
@@ -259,8 +266,10 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         // Calculate success rate for the selected deliverable
         if (totalTasks > 0) {
             $scope.successRate = (doneTasks / totalTasks) * 100;
+            $scope.notSuccessPercentage = 100 - $scope.successRate;
         } else {
             $scope.successRate = 0;  // No tasks
+            $scope.notSuccessPercentage = 0;
         }
 
         console.log("Success Rate for Deliverable:", selectedDeliverable, $scope.successRate + "%");
