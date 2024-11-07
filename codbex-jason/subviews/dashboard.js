@@ -239,7 +239,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         let doneTasks = 0;
 
         tasks.forEach(task => {
-            switch (task.StatusType) {
+            switch (task.Status) {
                 case 1:
                     $scope.taskCategories.Done.push(task);
                     doneTasks += 1;
@@ -295,7 +295,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
 
             // Map the StatusType to a status string
             $scope.milestones.forEach(milestone => {
-                milestone.statusText = statusTypeMapping[milestone.StatusType] || 'Unknown Status';
+                milestone.statusText = statusTypeMapping[milestone.Status] || 'Unknown Status';
             });
 
         } catch (error) {
@@ -308,7 +308,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             $scope.todayTasks = $scope.tasks.filter(task => {
                 const startDate = new Date(task.StartDate);
                 const endDate = new Date(task.EndDate);
-                const isNotDone = task.StatusType !== 1;
+                const isNotDone = task.Status !== 1;
                 const isTodayInRange = $scope.today >= startDate && $scope.today <= endDate;
                 return isNotDone && isTodayInRange;
             });
@@ -323,7 +323,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             // Calculate highest expense amount
             if ($scope.ExpenseData.Expenses.length > 0) {
                 const highestExpenseObj = $scope.ExpenseData.Expenses
-                    .filter(expense => expense.ApprovalStatus === 2) // Filter for approved expenses
+                    .filter(expense => expense.Status === 2) // Filter for approved expenses
                     .reduce((prev, current) => (prev.Amount > current.Amount) ? prev : current); // Find the one with the highest amount
 
                 // Set the highest expense and its date
@@ -333,9 +333,9 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
 
             // Calculate expense ratios
             const totalExpenses = $scope.ExpenseData.Expenses.length;
-            const approvedExpenses = $scope.ExpenseData.Expenses.filter(expense => expense.ApprovalStatus === 2).length;
-            const pendingExpenses = $scope.ExpenseData.Expenses.filter(expense => expense.ApprovalStatus === 1).length;
-            const declinedExpenses = $scope.ExpenseData.Expenses.filter(expense => expense.ApprovalStatus === 3).length;
+            const approvedExpenses = $scope.ExpenseData.Expenses.filter(expense => expense.Status === 2).length;
+            const pendingExpenses = $scope.ExpenseData.Expenses.filter(expense => expense.Status === 1).length;
+            const declinedExpenses = $scope.ExpenseData.Expenses.filter(expense => expense.Status === 3).length;
 
             // Store ratios in $scope
             if (totalExpenses > 0) {

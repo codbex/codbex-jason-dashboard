@@ -20,7 +20,7 @@ class DeliverableService {
                 t."DELIVERABLE_PROJECT" AS "ProjectId",
                 t."DELIVERABLE_COSTESTIMATION" AS "CostEstimation",
                 t."DELIVERABLE_ACTUALCOST" AS "ActualCost",
-                t."DELIVERABLE_STATUSTYPE" AS "StatusType"
+                t."DELIVERABLE_STATUS" AS "Status"
             FROM
                 "CODBEX_DELIVERABLE" t
             ORDER BY
@@ -36,7 +36,7 @@ class DeliverableService {
             "ProjectId": deliverable.ProjectId,
             "CostEstimation": deliverable.CostEstimation,
             "ActualCost": deliverable.ActualCost,
-            "StatusType": deliverable.StatusType,
+            "Status": deliverable.Status,
         }));
 
         return {

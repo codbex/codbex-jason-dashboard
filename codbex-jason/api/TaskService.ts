@@ -19,7 +19,7 @@ class TaskService {
                 t."TASK_DESCRIPTION" AS "Description",
                 t."TASK_STARTDATE" AS "StartDate",
                 t."TASK_ENDDATE" AS "EndDate",
-                t."TASK_STATUSTYPE" AS "StatusType",
+                t."TASK_STATUS" AS "Status",
                 t."TASK_DELIVERABLE" AS "Deliverable"
             FROM
                 "CODBEX_TASK" t
@@ -35,7 +35,7 @@ class TaskService {
             "Description": task.Description,
             "StartDate": task.StartDate,
             "EndDate": task.EndDate,
-            "StatusType": task.StatusType,
+            "Status": task.Status,
             "Deliverable": task.Deliverable
         }));
 

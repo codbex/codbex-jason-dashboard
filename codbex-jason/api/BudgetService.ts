@@ -17,7 +17,7 @@ class BudgetService {
     public budgetData() {
         const sqlBudget = `
             SELECT
-                SUM(b."BUDGET_INITIALBUDGET") AS "INITIALBUDGET_SUM",
+                SUM(b."BUDGET_AMOUNT") AS "AMOUNT_SUM",
                 SUM(b."BUDGET_COSTESTIMATION") AS "COSTESTIMATION_SUM"
             FROM
                 "CODBEX_BUDGET" b
@@ -27,7 +27,7 @@ class BudgetService {
         const budgetData = resultset[0];
 
         return {
-            "InitialBudget": budgetData.INITIALBUDGET_SUM,
+            "Amount": budgetData.AMOUNT_SUM,
             "CostEstimation": budgetData.COSTESTIMATION_SUM
         };
     }

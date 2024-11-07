@@ -18,7 +18,7 @@ class MilestoneService {
                 m."MILESTONEPERIOD_NAME" AS "Name",
                 m."MILESTONEPERIOD_DESCRIPTION" AS "Description",
                 m."MILESTONEPERIOD_RANGE" AS "Range",
-                m."MILESTONEPERIOD_STATUSTYPE" AS "StatusType"
+                m."MILESTONEPERIOD_STATUS" AS "Status"
             FROM
                 "CODBEX_MILESTONEPERIOD" m
         `;
@@ -30,7 +30,7 @@ class MilestoneService {
             "Name": milestone.Name,
             "Description": milestone.Description,
             "Range": milestone.Range,
-            "StatusType": milestone.StatusType
+            "Status": milestone.Status
         }));
 
         return {
