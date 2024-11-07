@@ -16,7 +16,8 @@ class BudgetService {
         SELECT
             e."EXPENSE_AMOUNT" AS "EXPENSE_AMOUNT",
             e."EXPENSE_DATE" AS "EXPENSE_DATE",
-            e."EXPENSE_STATUS" AS "EXPENSE_STATUS"
+            e."EXPENSE_STATUS" AS "EXPENSE_STATUS",
+            e."EXPENSE_PROJECT" AS "EXPENSE_PROJECT"
         FROM
             "CODBEX_EXPENSE" e
         `;
@@ -27,7 +28,8 @@ class BudgetService {
         const expenses = resultset.map(expense => ({
             "Amount": expense.EXPENSE_AMOUNT,
             "Date": expense.EXPENSE_DATE,
-            "Status": expense.EXPENSE_STATUS
+            "Status": expense.EXPENSE_STATUS,
+            "Project": expense.EXPENSE_PROJECT
         }));
 
         // Return all expenses in the response

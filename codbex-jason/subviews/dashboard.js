@@ -40,6 +40,13 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
         5: 'Research'
     };
 
+    const expenseStatusMapping = {
+        1: 'Pending',
+        2: 'Approved',
+        3: 'Declined'
+    };
+
+
     // Fetch Budget, Tasks, Milestones, and Expenses when document is ready
     angular.element($document[0]).ready(async function () {
         await getBudget();
@@ -161,16 +168,25 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             const response = await $http.get("/services/ts/codbex-jason/api/TaskService.ts/taskData");
             $scope.tasks = response.data.tasks;
 
-            // Update deliverables based on fetched tasks
-            const deliverableSet = new Set($scope.tasks.map(task => task.Deliverable));
-            $scope.deliverables = Array.from(deliverableSet);
+            // Update each task with its deliverable and project name
+            $scope.tasks.forEach(task => {
+                // Find the deliverable for the task
+                const deliverable = $scope.deliverables.find(del => del.Id === task.Deliverable);
+                task.deliverableName = deliverable ? deliverable.Name : 'Unknown Deliverable';
 
-            // Filter tasks for selected deliverable
-            $scope.filterTasksByDeliverable($scope.selectedDeliverable);
+                // Find the project associated with the deliverable
+                const project = deliverable ? $scope.projects.find(proj => proj.Id === deliverable.ProjectId) : null;
+                task.projectName = project ? project.Name : 'Unknown Project';
+            });
+
+            // Filter tasks for today
+            filterTodayTasks();
+
         } catch (error) {
             console.error('Error fetching tasks:', error);
         }
     }
+
 
     async function getDeliverables() {
         try {
@@ -320,38 +336,46 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             const response = await $http.get("/services/ts/codbex-jason/api/ExpenseService.ts/expenseData");
             $scope.ExpenseData = response.data;
 
-            // Calculate highest expense amount
-            if ($scope.ExpenseData.Expenses.length > 0) {
-                const highestExpenseObj = $scope.ExpenseData.Expenses
-                    .filter(expense => expense.Status === 2) // Filter for approved expenses
-                    .reduce((prev, current) => (prev.Amount > current.Amount) ? prev : current); // Find the one with the highest amount
-
-                // Set the highest expense and its date
+            // Calculate highest expense amount for approved expenses
+            const approvedExpenses = $scope.ExpenseData.Expenses.filter(expense => expense.Status === 2);
+            if (approvedExpenses.length > 0) {
+                const highestExpenseObj = approvedExpenses.reduce((prev, current) =>
+                    (prev.Amount > current.Amount) ? prev : current
+                );
                 $scope.highestExpense = highestExpenseObj.Amount;
                 $scope.highestExpenseDate = new Date(highestExpenseObj.Date).toISOString().split('T')[0];
             }
 
-            // Calculate expense ratios
-            const totalExpenses = $scope.ExpenseData.Expenses.length;
-            const approvedExpenses = $scope.ExpenseData.Expenses.filter(expense => expense.Status === 2).length;
-            const pendingExpenses = $scope.ExpenseData.Expenses.filter(expense => expense.Status === 1).length;
-            const declinedExpenses = $scope.ExpenseData.Expenses.filter(expense => expense.Status === 3).length;
+            // Calculate expense status counts and map status text and project name
+            const statusCounts = $scope.ExpenseData.Expenses.reduce((acc, expense) => {
+                // Map status text based on expenseStatusMapping
+                expense.statusText = expenseStatusMapping[expense.Status] || 'Unknown Status';
 
-            // Store ratios in $scope
-            if (totalExpenses > 0) {
-                $scope.expenseRatios.approved = approvedExpenses;
-                $scope.expenseRatios.pending = pendingExpenses;
-                $scope.expenseRatios.declined = declinedExpenses;
-            } else {
-                // If no expenses, set ratios to 0
-                $scope.expenseRatios.approved = 0;
-                $scope.expenseRatios.pending = 0;
-                $scope.expenseRatios.declined = 0;
-            }
+                const project = $scope.projects.find(proj => proj.Id === expense.Project);
+                expense.projectName = project ? project.Name : 'Unknown Project';
+
+
+                // Count each status
+                acc[expense.Status] = (acc[expense.Status] || 0) + 1;
+                return acc;
+            }, {});
+
+            // Calculate total expense ratios
+            const totalExpenses = $scope.ExpenseData.Expenses.length;
+            $scope.expenseRatios = {
+                approved: statusCounts[2] || 0,
+                pending: statusCounts[1] || 0,
+                declined: statusCounts[3] || 0
+            };
+
+            console.log($scope.ExpenseData);
+
         } catch (error) {
             console.error('Error fetching expense data:', error);
         }
     }
+
+
 
     $scope.openPerspective = function (perspective) {
         if (perspective === 'all-tasks') {
