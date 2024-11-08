@@ -336,12 +336,15 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             const response = await $http.get("/services/ts/codbex-jason/api/ExpenseService.ts/expenseData");
             $scope.ExpenseData = response.data;
 
-            // Calculate highest expense amount for approved expenses
-            const approvedExpenses = $scope.ExpenseData.Expenses.filter(expense => expense.Status === 2);
+            // Calculate highest expense amount for approved expenses (limited to top 5)
+            const approvedExpenses = $scope.ExpenseData.Expenses
+                .filter(expense => expense.Status === 2) // Filter for approved expenses
+                .sort((a, b) => b.Amount - a.Amount) // Sort by Amount in descending order
+                .slice(0, 5); // Limit to top 5 expenses
+
             if (approvedExpenses.length > 0) {
-                const highestExpenseObj = approvedExpenses.reduce((prev, current) =>
-                    (prev.Amount > current.Amount) ? prev : current
-                );
+                // Store the highest amount from the top 5
+                const highestExpenseObj = approvedExpenses[0];
                 $scope.highestExpense = highestExpenseObj.Amount;
                 $scope.highestExpenseDate = new Date(highestExpenseObj.Date).toISOString().split('T')[0];
             }
@@ -353,7 +356,6 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
 
                 const project = $scope.projects.find(proj => proj.Id === expense.Project);
                 expense.projectName = project ? project.Name : 'Unknown Project';
-
 
                 // Count each status
                 acc[expense.Status] = (acc[expense.Status] || 0) + 1;
@@ -368,7 +370,6 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
                 declined: statusCounts[3] || 0
             };
 
-            console.log($scope.ExpenseData);
 
         } catch (error) {
             console.error('Error fetching expense data:', error);
