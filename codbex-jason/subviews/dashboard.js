@@ -51,9 +51,9 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
     angular.element($document[0]).ready(async function () {
         await getBudget();
         await getProjects(); // Fetch projects
+        await getDeliverables();
         await getTasks();
 
-        await getDeliverables();
         // Filter deliverables by the selected project
         $scope.filterDeliverableByProject($scope.selectedProject);
 
@@ -171,6 +171,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             // Update each task with its deliverable and project name
             $scope.tasks.forEach(task => {
                 // Find the deliverable for the task
+
                 const deliverable = $scope.deliverables.find(del => del.Id === task.Deliverable);
                 task.deliverableName = deliverable ? deliverable.Name : 'Unknown Deliverable';
 
