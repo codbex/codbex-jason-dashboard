@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" ng-app="dashboard" ng-controller="DashboardController">
+
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" sizes="any" href="data:;base64,iVBORw0KGgo=">
+        <title dg-view-title></title>
+        <script type="text/javascript" src="../services/dashboard.js"></script>
+        <theme></theme>
+        <script type="text/javascript" src="/services/js/resources-core/services/loader.js?id=application-view-js">
+        </script>
+        <link type="text/css" rel="stylesheet"
+            href="/services/js/resources-core/services/loader.js?id=application-view-css" />
+        <script type="text/javascript" src="dashboard.js"></script>
+        <script type="text/javascript" src="/webjars/chart.js/4.4.3/dist/chart.umd.js"></script>
+        <style>
+            .tile-auto-layout {
+                min-height: auto;
+                height: auto;
+                width: auto;
+                max-width: 100%;
+            }
+
+        </style>
+    </head>
+
+    <body fd-scrollbar class="fd-padding-begin-end--tiny">
+        <fd-busy-indicator-extended class="dg-fill-parent" ng-hide="state.error || !state.isBusy" dg-size="l">
+            {{state.busyText}}
+        </fd-busy-indicator-extended>
+
+        <div class="fd-container" ng-show="!state.error && !state.isBusy">
+            <h2 fd-title header-size="2" class="fd-margin-top--sm fd-margin-bottom--tiny">Welcome to Project Management
+                Dashboard
+            </h2>
+
+
+            <fd-panel expanded="true" class="fd-col fd-col--12">
+                <fd-panel-header>
+                    <fd-panel-expand></fd-panel-expand>
+                    <h4 fd-panel-title>Budget</h4>
+                </fd-panel-header>
+                <fd-panel-content aria-label="Budget Content">
+                    <div class="fd-row" style="margin: 0.5em">
+                        <div class="fd-col fd-col--12 fd-col-md--6 fd-col-lg--6 fd-col-xl--6">
+                            <fd-card card-type="table">
+                                <fd-card-content>
+                                    <table fd-table inner-borders="horizontal" outer-borders="none"
+                                        style="min-height:12.5rem">
+                                        <tbody fd-table-body>
+                                            <tr fd-table-row>
+                                                <td fd-table-cell width="50%">
+                                                    <canvas id="doughnutChartBudget" width="200" height="200"></canvas>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </fd-card-content>
+                            </fd-card>
+                        </div>
+                        <div class="fd-col fd-col--6 fd-col-md--3 fd-col-lg--3 fd-col-xl--3">
+                            <div role="button" tabindex="0" class="fd-tile fd-tile--feed tile-auto-layout"
+                                ng-click="openPerspective('project')">
+                                <div class="fd-tile__header tile-auto-layout">
+                                    <div class="fd-tile__title">Initial Budget</div>
+                                </div>
+                                <div class="fd-tile__content tile-auto-layout">
+                                    <div class="fd-tile__section">
+                                        <div class="fd-numeric-content">
+                                            <div class="fd-numeric-content__kpi-container">
+                                                <div class="fd-numeric-content__kpi">
+                                                    {{BudgetData.InitialBudget }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fd-tile__footer tile-auto-layout">
+                                    <span class="fd-tile__footer-text">BGN</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fd-panel-content>
+            </fd-panel>
+
+            <fd-panel expanded="true" class="fd-col fd-col--12">
+                <fd-panel-header>
+                    <fd-panel-expand></fd-panel-expand>
+                    <h4 fd-panel-title>Expenses</h4>
+                </fd-panel-header>
+                <fd-panel-content aria-label="Expense Content">
+                    <div class="fd-row" style="margin: 0.5em">
+                        <div class="fd-col fd-col--12 fd-col-md--6 fd-col-lg--6 fd-col-xl--6">
+                            <fd-card card-type="table">
+                                <fd-card-content>
+                                    <table fd-table inner-borders="horizontal" outer-borders="none"
+                                        style="min-height:12.5rem">
+                                        <tbody fd-table-body>
+                                            <tr fd-table-row>
+                                                <td fd-table-cell width="50%">
+                                                    <canvas id="doughnutChartExpenses" width="200"
+                                                        height="200"></canvas>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </fd-card-content>
+                            </fd-card>
+                        </div>
+                        <div class="fd-col fd-col--6 fd-col-md--3 fd-col-lg--3 fd-col-xl--3">
+                            <table class="fd-table fd-table--no-horizontal-borders fd-table--no-vertical-borders">
+                                <thead class="fd-table__header">
+                                    <tr class="fd-table__row">
+                                        <th class="fd-table__cell" scope="col">Project</th>
+                                        <th class="fd-table__cell" scope="col">Amount</th>
+                                        <th class="fd-table__cell" scope="col">Date</th>
+                                        <th class="fd-table__cell" scope="col">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="fd-table__body">
+                                    <tr ng-repeat="expense in ExpenseData.Expenses">
+                                        <td class="fd-table__cell">{{expense.projectName}}</td>
+                                        <td class="fd-table__cell">{{expense.Amount | currency}}</td>
+                                        <td class="fd-table__cell">{{expense.Date | date : 'shortDate'}}</td>
+                                        <td class="fd-table__cell">{{expense.statusText}}</td>
+                                    </tr>
+                                    <tr ng-if="ExpenseData.Expenses.length === 0">
+                                        <td colspan="4" class="fd-table__cell">No expenses.</td>
+                                    </tr>
+                                </tbody>
+
+                                <div class="fd-tile__footer tile-auto-layout">
+                                    <span class="fd-tile__footer-text">Today: {{ today | date:'dd-MM-yyyy' }}</span>
+                                </div>
+                            </table>
+                        </div>
+                    </div>
+                </fd-panel-content>
+            </fd-panel>
+
+
+            <fd-panel expanded="true" class="fd-col fd-col--12 fd-col-md--12">
+                <fd-panel-header>
+                    <fd-panel-expand></fd-panel-expand>
+                    <h4 fd-panel-title>Tasks</h4>
+                </fd-panel-header>
+                <fd-panel-content aria-label="Task Content">
+                    <div class="fd-layout-grid">
+                        <div class="fd-row">
+                            <div class="fd-col fd-col--6 fd-col-md--6 fd-col-lg--6 fd-col-xl--6">
+                                <div role="button" tabindex="0" class="fd-tile fd-tile--feed tile-auto-layout"
+                                    ng-click="openPerspective('all-tasks')">
+                                    <div class="fd-tile__header tile-auto-layout">
+                                        <div class="fd-tile__title">All Tasks</div>
+                                    </div>
+                                    <div class="fd-tile__content tile-auto-layout">
+                                        <div class="fd-tile__section">
+                                            <div class="fd-numeric-content">
+                                                <div class="fd-numeric-content__kpi-container">
+                                                    <div class="fd-numeric-content__kpi">
+                                                        Click me
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <br>
+                                <table class="fd-table fd-table--no-horizontal-borders fd-table--no-vertical-borders">
+                                    <thead class="fd-table__header">
+                                        <tr class="fd-table__row">
+                                            <th class="fd-table__cell" scope="col">Project</th>
+                                            <th class="fd-table__cell" scope="col">Task Name</th>
+                                            <th class="fd-table__cell" scope="col">Description</th>
+                                            <th class="fd-table__cell" scope="col">Start Date</th>
+                                            <th class="fd-table__cell" scope="col">End Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="fd-table__body">
+                                        <tr ng-repeat="task in todayTasks">
+                                            <td class="fd-table__cell">{{task.projectName}}</td>
+                                            <td class="fd-table__cell">{{task.Name}}</td>
+                                            <td class="fd-table__cell">{{task.Description}}</td>
+                                            <td class="fd-table__cell">{{task.StartDate | date : 'shortDate'}}</td>
+                                            <td class="fd-table__cell">{{task.EndDate | date : 'shortDate'}}</td>
+                                        </tr>
+                                        <tr ng-if="expense.length === 0">
+                                            <td colspan="4" class="fd-table__cell">No tasks for today.</td>
+                                        </tr>
+                                    </tbody>
+                                    <div class="fd-tile__footer tile-auto-layout">
+                                        <span class="fd-tile__footer-text">Today: {{ today | date:'dd-MM-yyyy' }}</span>
+                                    </div>
+                                </table>
+                            </div>
+
+                            <div class="fd-col fd-col--6 fd-col-md--6 fd-col-lg--6 fd-col-xl--6">
+                                <fd-card card-type="table">
+                                    <fd-card-content>
+                                        <table fd-table inner-borders="horizontal" outer-borders="none"
+                                            style="min-height:12.5rem">
+                                            <tbody fd-table-body>
+                                                <tr fd-table-row>
+                                                    <td fd-table-cell width="50%">
+                                                        <canvas id="doughnutChartTasks" width="200"
+                                                            height="200"></canvas>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </fd-card-content>
+                                </fd-card>
+                            </div>
+                        </div>
+                    </div>
+                </fd-panel-content>
+            </fd-panel>
+
+            <fd-panel expanded="true" class="fd-col fd-col--12 fd-col-md--12">
+                <fd-panel-header>
+                    <fd-panel-expand></fd-panel-expand>
+                    <h4 fd-panel-title>Milestones</h4>
+                </fd-panel-header>
+                <fd-panel-content aria-label="Milestones">
+                    <div class="fd-col fd-col--12 fd-col-md--12">
+                        <table class="fd-table fd-table--no-horizontal-borders fd-table--no-vertical-borders">
+                            <thead class="fd-table__header">
+                                <tr class="fd-table__row">
+                                    <th class="fd-table__cell" scope="col">Milestone Name</th>
+                                    <th class="fd-table__cell" scope="col">Description</th>
+                                    <th class="fd-table__cell" scope="col">Due</th>
+                                    <th class="fd-table__cell" scope="col">Status Type</th>
+                                </tr>
+                            </thead>
+                            <tbody class="fd-table__body">
+                                <tr ng-repeat="milestone in milestones">
+                                    <td class="fd-table__cell">{{milestone.Name}}</td>
+                                    <td class="fd-table__cell">{{milestone.Description}}</td>
+                                    <td class="fd-table__cell">{{milestone.Range | date : 'shortDate'}}</td>
+                                    <td class="fd-table__cell">{{ milestone.statusText }}</td>
+                                </tr>
+                                <tr ng-if="milestones.length === 0">
+                                    <td colspan="4" class="fd-table__cell">No milestones available.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </fd-panel-content>
+            </fd-panel>
+
+            <fd-panel expanded="true" class="fd-col fd-col--12 fd-col-md--12">
+                <fd-panel-header>
+                    <fd-panel-expand></fd-panel-expand>
+                    <h4 fd-panel-title>Success rate</h4>
+                </fd-panel-header>
+                <fd-panel-content aria-label="Success Content">
+                    <div class="fd-layout-grid">
+                        <div class="fd-row">
+                            <div class="fd-col">
+                                <div>
+                                    <label for="projectSelect">Select Project:</label>
+                                    <select id="projectSelect" ng-model="selectedProject"
+                                        ng-options="project.Name for project in projects"
+                                        ng-change="filterDeliverableByProject(selectedProject)">
+                                        <option value="">Select a Project</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label for="deliverableSelect">Select Deliverable:</label>
+                                    <select id="deliverableSelect" ng-model="selectedDeliverable"
+                                        ng-options="deliverable.Name for deliverable in filteredDeliverables"
+                                        ng-change="filterTasksByDeliverable(selectedDeliverable)">
+                                        <option value="">Select a Deliverable</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="fd-col fd-col--6 fd-col-md--6 fd-col-lg--6 fd-col-xl--6">
+                            <fd-card card-type="table">
+                                <fd-card-content>
+                                    <table fd-table inner-borders="horizontal" outer-borders="none"
+                                        style="min-height:12.5rem">
+                                        <tbody fd-table-body>
+                                            <tr fd-table-row>
+                                                <td fd-table-cell width="50%">
+                                                    <canvas id="doughnutChartSuccess" width="200" height="200"></canvas>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </fd-card-content>
+                            </fd-card>
+                        </div>
+                    </div>
+        </div>
+        </fd-panel-content>
+        </fd-panel>
+        </div>
+
+        <fd-message-page glyph="sap-icon--error" ng-if="state.error">
+            <fd-message-page-title>Dashboard encountered an error!</fd-message-page-title>
+            <fd-message-page-subtitle>{{errorMessage}}</fd-message-page-subtitle>
+        </fd-message-page>
+        </div>
+    </body>
+
+</html>

@@ -1,0 +1,5 @@
+{
+    "module": "codbex-jason/services/agilemethodology.js",
+    "extensionPoint": "ide-subview",
+    "description": "Agile Methodology Subview"
+}

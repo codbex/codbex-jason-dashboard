@@ -1,0 +1,5 @@
+{
+    "module": "codbex-jason/services/iterationlenght.js",
+    "extensionPoint": "ide-subview",
+    "description": "Iteration Lenght Subview"
+}

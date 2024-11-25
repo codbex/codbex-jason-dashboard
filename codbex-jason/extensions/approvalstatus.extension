@@ -1,0 +1,5 @@
+{
+    "module": "codbex-jason/services/approvalstatus.js",
+    "extensionPoint": "ide-subview",
+    "description": "Approval Status Subview"
+}

@@ -1,0 +1,27 @@
+{
+    "guid": "codbex-jason",
+    "dependencies": [
+        {
+            "guid": "codbex-projects",
+            "type": "git",
+            "url": "https://github.com/codbex/codbex-projects.git",
+            "branch": "main"
+        }
+    ],
+    "actions": [
+        {
+            "name": "Build TypeScript",
+            "commands": [
+                {
+                    "os": "unix",
+                    "command": "tsc"
+                },
+                {
+                    "os": "windows",
+                    "command": "cmd /c tsc"
+                }
+            ],
+            "registry": "true"
+        }
+    ]
+}

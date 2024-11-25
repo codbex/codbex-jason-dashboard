@@ -1,0 +1,5 @@
+{
+    "module": "codbex-jason/services/statustype.js",
+    "extensionPoint": "ide-subview",
+    "description": "Status Type Subview"
+}

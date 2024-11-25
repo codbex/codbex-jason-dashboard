@@ -1,0 +1,5 @@
+{
+    "module": "codbex-jason/services/memberrole.js",
+    "extensionPoint": "ide-subview",
+    "description": "Member Role Subview"
+}

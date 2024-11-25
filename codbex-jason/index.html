@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+<html lang="en" ng-app="launchpad" ng-controller="LaunchpadViewController" xmlns="http://www.w3.org/1999/xhtml">
+
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title dg-brand-title></title>
+		<link rel="icon" href="data:;base64,iVBORw0KGgo=" dg-brand-icon />
+		<script type="text/javascript" src="services/navigation.js"></script>
+		<theme></theme>
+		<script type="text/javascript"
+			src="/services/js/resources-core/services/loader.js?id=application-perspective-js">
+		</script>
+		<link type="text/css" rel="stylesheet"
+			href="/services/js/resources-core/services/loader.js?id=application-perspective-css" />
+		<script type="text/javascript" src="js/navigation.js"></script>
+
+	</head>
+
+	<body>
+		<ide-header menu-ext-id="codbex-jason-menu"></ide-header>
+		<ide-contextmenu></ide-contextmenu>
+		<div class="dg-hbox dg-fill-parent">
+			<fd-vertical-nav can-scroll="true" class="dg-border-right"
+				style="box-shadow:none;max-height:calc(100vh - 4.375rem)">
+				<fd-vertical-nav-main-section aria-label="main navigation">
+					<fd-list>
+						<fd-list-navigation-item ng-click="switchView('dashboard')">
+							<fd-list-navigation-item-icon glyph="sap-icon--home">
+							</fd-list-navigation-item-icon>
+							<span fd-list-navigation-item-text>Dashboard</span>
+						</fd-list-navigation-item>
+						<div ng-repeat="section in sections">
+							<fd-list-navigation-group-header>{{section.name}}</fd-list-navigation-group-header>
+							<div ng-repeat="group in section.groups">
+								<fd-list-navigation-item ng-init="group.expanded = false" expandable="true"
+									ng-click="group.expanded = !group.expanded" is-expanded="group.expanded">
+									<fd-list-navigation-item-icon glyph="sap-icon--{{group.icon}}">
+									</fd-list-navigation-item-icon>
+									<span fd-list-navigation-item-text>{{group.name}}</span>
+									<fd-list-navigation-item-arrow aria-label="expand submenu"
+										is-expanded="group.expanded">
+									</fd-list-navigation-item-arrow>
+									<fd-list ng-repeat="item in group.items">
+										<fd-list-navigation-item ng-click="switchView(item.view, $event)">
+											<span fd-list-navigation-item-text>{{item.name}}</span>
+										</fd-list-navigation-item>
+									</fd-list>
+								</fd-list-navigation-item>
+							</div>
+						</div>
+
+					</fd-list>
+				</fd-vertical-nav-main-section>
+			</fd-vertical-nav>
+
+			<!--Dashboard -->
+			<embedded-view class="dg-fill-parent" view-id="codbex-jason-dashboard" dg-type="normal"
+				ng-show="currentViewId === 'dashboard'">
+			</embedded-view>
+
+			<!--Projects -->
+			<embedded-view class="dg-fill-parent" view-id="codbex-jason-projects" dg-type="subview"
+				ng-show="currentViewId === 'projects'">
+			</embedded-view>
+			<embedded-view class="dg-fill-parent" view-id="codbex-jason-deliverables" dg-type="subview"
+				ng-show="currentViewId === 'deliverables'">
+			</embedded-view>
+
+			<!--People -->
+			<embedded-view class="dg-fill-parent" view-id="codbex-jason-organisations" dg-type="subview"
+				ng-show="currentViewId === 'organisations'">
+			</embedded-view>
+			<embedded-view class="dg-fill-parent" view-id="codbex-jason-employees" dg-type="subview"
+				ng-show="currentViewId === 'employees'">
+			</embedded-view>
+
+
+			<!--Settings -->
+			<embedded-view class="dg-fill-parent" view-id="codbex-jason-agilemethodology" dg-type="subview"
+				ng-show="currentViewId === 'agilemethodology'">
+			</embedded-view>
+			<embedded-view class="dg-fill-parent" view-id="codbex-jason-approvalstatus" dg-type="subview"
+				ng-show="currentViewId === 'approvalstatus'">
+			</embedded-view>
+			<embedded-view class="dg-fill-parent" view-id="codbex-jason-costcategory" dg-type="subview"
+				ng-show="currentViewId === 'costcategory'">
+			</embedded-view>
+			<embedded-view class="dg-fill-parent" view-id="codbex-jason-expensecategory" dg-type="subview"
+				ng-show="currentViewId === 'expensecategory'">
+			</embedded-view>
+			<embedded-view class="dg-fill-parent" view-id="codbex-jason-iterationlenght" dg-type="subview"
+				ng-show="currentViewId === 'iterationlenght'">
+			</embedded-view>
+			<embedded-view class="dg-fill-parent" view-id="codbex-jason-memberrole" dg-type="subview"
+				ng-show="currentViewId === 'memberrole'">
+			</embedded-view>
+			<embedded-view class="dg-fill-parent" view-id="codbex-jason-resourcetype" dg-type="subview"
+				ng-show="currentViewId === 'resourcetype'">
+			</embedded-view>
+			<embedded-view class="dg-fill-parent" view-id="codbex-jason-stakeholdertype" dg-type="subview"
+				ng-show="currentViewId === 'stakeholdertype'">
+			</embedded-view>
+			<embedded-view class="dg-fill-parent" view-id="codbex-jason-statustype" dg-type="subview"
+				ng-show="currentViewId === 'statustype'">
+			</embedded-view>
+		</div>
+
+		<ide-dialogs extension-points="::extraExtensionPoints"></ide-dialogs>
+		<ide-status-bar></ide-status-bar>
+	</body>
+
+</html>
