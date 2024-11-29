@@ -21,6 +21,7 @@ navigation.controller("LaunchpadViewController", ["$scope", "messageHub", "$http
                     "items": [
                         { "name": "Projects", "view": "projects" },
                         { "name": "Deliverables", "view": "deliverables" },
+                        { "name": "Milestones", "view": "milestones" },
                     ]
                 }
             ]

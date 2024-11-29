@@ -1,4 +1,4 @@
-import { MilestoneRepository as MilestoneDao } from "codbex-projects/gen/codbex-projects/dao/Project/MilestoneRepository";
+import { MilestoneRepository as MilestoneDao } from "codbex-projects/gen/codbex-projects/dao/Milestone/MilestoneRepository";
 import { Controller, Get } from "sdk/http";
 import { query } from "sdk/db";
 
