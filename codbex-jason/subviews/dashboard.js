@@ -59,6 +59,7 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
 
         await getMilestones();
         await getExpense();
+        await getMilestoneDeliverables();
         filterTodayTasks();
         setupDoughnutCharts();
 
@@ -310,9 +311,11 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             const response = await $http.get(milestoneServiceUrl);
             $scope.milestones = response.data.milestones;
 
-            // Map the StatusType to a status string
             $scope.milestones.forEach(milestone => {
-                milestone.statusText = statusTypeMapping[milestone.Status] || 'Unknown Status';
+                const project = $scope.projects.find(proj => proj.Id === milestone.Project);
+                milestone.projectName = project ? project.Name : "Unknown Project";
+                const deliverable = $scope.deliverables.find(del => del.Id === milestone.Deliverable);
+                milestone.deliverableName = deliverable ? deliverable.Name : "No Deliverable";
             });
 
         } catch (error) {
@@ -376,6 +379,37 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
             console.error('Error fetching expense data:', error);
         }
     }
+
+
+    async function getMilestoneDeliverables() {
+        const milestoneDeliverableServiceUrl = "/services/ts/codbex-jason/api/MilestoneDeliverableService.ts/milestoneDeliverableData";
+        try {
+            // Fetch milestone deliverables
+            const response = await $http.get(milestoneDeliverableServiceUrl);
+            const milestoneDeliverables = response.data.milestoneDeliverables;
+
+            // Match deliverables with milestones
+            $scope.milestones.forEach(milestone => {
+                const matchingDeliverables = milestoneDeliverables.filter(deliverable => deliverable.Milestone === milestone.Id);
+
+                if (matchingDeliverables.length > 0) {
+                    milestone.deliverables = matchingDeliverables.map(del => ({
+                        Id: del.Id,
+                        Description: del.Description,
+                        StartDate: del.StartDate,
+                        EndDate: del.EndDate
+                    }));
+                } else {
+                    milestone.deliverables = [];
+                }
+            });
+
+            console.log("Milestones with Deliverables:", $scope.milestones);
+        } catch (error) {
+            console.error('Error fetching milestone deliverables:', error);
+        }
+    }
+
 
 
 

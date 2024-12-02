@@ -230,23 +230,30 @@
                         <table class="fd-table fd-table--no-horizontal-borders fd-table--no-vertical-borders">
                             <thead class="fd-table__header">
                                 <tr class="fd-table__row">
-                                    <th class="fd-table__cell" scope="col">Milestone Name</th>
-                                    <th class="fd-table__cell" scope="col">Description</th>
-                                    <th class="fd-table__cell" scope="col">Due</th>
-                                    <th class="fd-table__cell" scope="col">Status Type</th>
+                                    <th class="fd-table__cell" scope="col">Milestone</th>
+                                    <th class="fd-table__cell" scope="col">Project</th>
+                                    <th class="fd-table__cell" scope="col">Milestone Deliverable</th>
                                 </tr>
                             </thead>
                             <tbody class="fd-table__body">
                                 <tr ng-repeat="milestone in milestones">
-                                    <td class="fd-table__cell">{{milestone.Name}}</td>
-                                    <td class="fd-table__cell">{{milestone.Description}}</td>
-                                    <td class="fd-table__cell">{{milestone.Range | date : 'shortDate'}}</td>
-                                    <td class="fd-table__cell">{{ milestone.statusText }}</td>
+                                    <td class="fd-table__cell">{{ milestone.Name }}</td>
+                                    <td class="fd-table__cell">{{ milestone.projectName }}</td>
+                                    <td class="fd-table__cell">
+                                        <ul>
+                                            <li ng-repeat="deliverable in milestone.deliverables">
+                                                {{ deliverable.Description }}
+                                                ({{ deliverable.StartDate | date:'shortDate' }} -
+                                                {{ deliverable.EndDate | date:'shortDate' }})
+                                            </li>
+                                        </ul>
+                                    </td>
                                 </tr>
                                 <tr ng-if="milestones.length === 0">
-                                    <td colspan="4" class="fd-table__cell">No milestones available.</td>
+                                    <td colspan="3" class="fd-table__cell">No milestones available.</td>
                                 </tr>
                             </tbody>
+
                         </table>
                     </div>
                 </fd-panel-content>

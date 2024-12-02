@@ -16,11 +16,10 @@ class MilestoneService {
             SELECT
                 m."MILESTONEPERIOD_ID" AS "Id",
                 m."MILESTONEPERIOD_NAME" AS "Name",
-                m."MILESTONEPERIOD_DESCRIPTION" AS "Description",
-                m."MILESTONEPERIOD_RANGE" AS "Range",
-                m."MILESTONEPERIOD_STATUS" AS "Status"
+                m."MILESTONEPERIOD_PROJECT" AS "Project",
+                m."MILESTONEPERIOD_DELIVERABLE" AS "Deliverable"
             FROM
-                "CODBEX_MILESTONEPERIOD" m
+                "CODBEX_MILESTONE" m
         `;
 
         let resultset = query.execute(sqlMilestones);
@@ -28,9 +27,8 @@ class MilestoneService {
         const milestoneData = resultset.map(milestone => ({
             "Id": milestone.Id,
             "Name": milestone.Name,
-            "Description": milestone.Description,
-            "Range": milestone.Range,
-            "Status": milestone.Status
+            "Project": milestone.Project,
+            "Deliverable": milestone.Deliverable
         }));
 
         return {
