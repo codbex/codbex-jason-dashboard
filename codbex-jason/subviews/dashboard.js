@@ -70,9 +70,9 @@ dashboard.controller('DashboardController', ['$scope', '$document', '$http', 'me
 
     function setupDoughnutCharts() {
         const budgetDataDoughnut = {
-            labels: ["Initial Budget", "Cost Estimation"],
+            labels: ["Budget Amount", "Cost Estimation"],
             datasets: [{
-                data: [$scope.BudgetData.InitialBudget, $scope.BudgetData.CostEstimation],
+                data: [$scope.BudgetData.Amount, $scope.BudgetData.CostEstimation],
                 backgroundColor: ['#36a2eb', '#ff6384']
             }]
         };
